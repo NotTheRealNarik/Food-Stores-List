@@ -82,3 +82,16 @@ exports.updateStore = async (req,res) => {
     res.redirect(`/stores/${store._id}/edit`);
 
 }
+
+
+exports.getStoreBySlug = async (req, res) =>{
+    //res.json(req.params.slug)
+    const store = await Store.findOne({ slug:req.params.slug})
+    if (!store){
+        //if store doesnt exist we go to next. in app.js next goes to error handlers.. which gives a 404 error.
+        return next();
+    }
+    else{
+        res.render('store', {store, title: store.name}); // we render store.pug from views folder and display its content
+    }
+}

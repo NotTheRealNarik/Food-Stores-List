@@ -23,9 +23,18 @@ router.post('/add/:id',
 router.get('/stores/:id/edit',catchErrors(storeController.editStore));
 
 
+router.get('/store/:slug', catchErrors(storeController.getStoreBySlug));
+
+
+
+// test test
 router.get('/reverse/:name',(req,res)=>{
   const reverse = [...req.params.name].reverse().join('');
   res.send(reverse)
 });
+
+
+
+
 
 module.exports = router;
