@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
-const slug = require('slugs')
+const slug = require('slugs');
+const { Store } = require('express-session');
 
 const storeSchema = new mongoose.Schema({
     name:{
@@ -45,12 +46,20 @@ const storeSchema = new mongoose.Schema({
 });
 
 
-storeSchema.pre('save',function(next){
+storeSchema.pre('save', async function(next){
     if (!this.isModified('name')){
         next(); // skip it
         return; //stop this function 
     }
     this.slug = slug(this.name);
+    //find duplicates with same slug and handle it
+    const slugRegEx = new RegExp(`^(${this.slug})((-[0-9]*$)?)$`,'i');
+    const storesWithSlug = await this.constructor.find({slug: slugRegEx}); //this.constructor is equal to "Store"
+    if(storesWithSlug.length){
+        //overwrite this.slug
+        this.slug = `${this.slug}-${storesWithSlug.length+1}`;
+    }
+    
     next();
     // check for unique slug
 
