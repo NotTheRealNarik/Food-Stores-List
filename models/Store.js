@@ -65,4 +65,17 @@ storeSchema.pre('save', async function(next){
 
 })
 
+storeSchema.statics.getTagsList =  function(){ // we use normal 'function isntead of arrow function because we need to use 'this'
+    return this.aggregate([
+        {$unwind: '$tags'}, // we unwind on the field 'tags' from the database
+        {$group: {_id:'$tags', count: {$sum:1} }}, // here we group based on 'tags' and make a count adn inceremnt by 1 to the sum
+        {$sort: {count:-1} } // 1 is ascending and -1 is decending
+        //{$sortByCount: '$tags'} $sortByCount can be used directly without $group
+
+
+    ]);
+    //aggregate() is like find() method. check mongodb aggregate page
+} 
+
+
 module.exports = mongoose.model('Store', storeSchema);

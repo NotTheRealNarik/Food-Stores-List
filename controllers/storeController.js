@@ -95,3 +95,14 @@ exports.getStoreBySlug = async (req, res) =>{
         res.render('store', {store, title: store.name}); // we render store.pug from views folder and display its content
     }
 }
+
+
+exports.getStoresByTag = async (req, res) =>{
+    const cur_tag = req.params.tag;
+    const tagQuery = cur_tag || {$exists: true};
+    const tagsPromise =  Store.getTagsList();
+    const storesPromise = Store.find({tags: tagQuery});
+    const [tags,stores] = await Promise.all([tagsPromise, storesPromise]);
+
+    res.render('tag.pug',{ tags, title:'Tags' , cur_tag, stores});
+}

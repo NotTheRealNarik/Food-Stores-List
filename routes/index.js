@@ -1,13 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const storeController = require('../controllers/storeController')
+const storeController = require('../controllers/storeController');
+const userController = require('../controllers/userController');
+const authController = require('../controllers/authController');
+
 const {catchErrors} = require('../handlers/errorHandlers') // imporitng catchErrors mathod
 
 // Do work here
 router.get('/', catchErrors(storeController.getStores));
 router.get('/stores', storeController.getStores);
 
-router.get('/add', storeController.addStore);
+router.get('/add', authController.isLoggedIn, storeController.addStore);
 
 router.post('/add', 
             storeController.upload, 
@@ -25,13 +28,35 @@ router.get('/stores/:id/edit',catchErrors(storeController.editStore));
 
 router.get('/store/:slug', catchErrors(storeController.getStoreBySlug));
 
+router.get('/tags', catchErrors(storeController.getStoresByTag));
+router.get('/tags/:tag', catchErrors(storeController.getStoresByTag));
+
+router.get('/login', userController.loginForm);
+router.post('/login', 
+            userController.validateLogin,
+            authController.login);
+router.get('/register', userController.registerForm);
+// 1. validate data of the person registering
+// 2. register the user in mongodb
+// 3. log them in
+
+router.post('/register', 
+            userController.validateRegister,
+            userController.register,
+            authController.login);
 
 
-// test test
+
+router.get('/logout', authController.logout);
+
+//test test
 router.get('/reverse/:name',(req,res)=>{
   const reverse = [...req.params.name].reverse().join('');
   res.send(reverse)
+
 });
+
+
 
 
 

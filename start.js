@@ -15,7 +15,10 @@ mongoose.connection.on('error', (err) => {
 
 
 // IMPORT MODELS HERE ONCE
-require('./models/store');
+require('./models/Store');
+
+require('./models/User');
+
 
 // Start our app!
 const app = require('./app');
