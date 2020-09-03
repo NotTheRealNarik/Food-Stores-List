@@ -72,6 +72,29 @@ exports.register = async (req, res, next)=>{ // we pass next becasue it is a mid
     //promisify() second arg: if the method you are trinyg to promisify (User.register) lives on an object, we need to pass the object as the second arg
     await register(user, req.body.password);
     next()
-}
+};
+
+
+exports.account = (req, res) =>{
+    res.render('account.pug', {title:'Edit Your Account'});
+
+};
+
+exports.updateAccount = async (req,res) =>{
+    const update = {
+        name: req.body.name,
+        email: req.body.email
+    }
+    const user = await User.findOneAndUpdate(
+        { _id: req.user._id }, //quesry from database
+        { $set: update }, //update from updates variable
+        { new: true, runValidators: true, context: 'query'} //options
+
+    );
+    res.redirect('/account');
+};
+
+
+
 
 
