@@ -48,6 +48,7 @@ exports.resize = async(req, res, next)=>{
 };
 
 exports.createStore = async (req,res) =>{
+    req.body.author = req.user._id; // populate the author field with user _id
     // when you clock save store, this method gets the info and saves in 'store' variable
     const store = await (new Store(req.body)).save(); //"Store" is being sent ot Store.js and follow the databaseSchema we defined
     // .save()  SAVES the data into the mongoDB database
@@ -61,9 +62,17 @@ exports.getStores = async (req,res) => {
     res.render('stores',{title:'Stores', stores: stores}) //render stores.pug and send title and stores as props
 }
 
+const confirmOwner = (store, user) => {
+    if(!store.author.equals(user._id)){
+        throw Error('You must own a store in order to edit it')
+    }
+}
+
 exports.editStore = async (req,res) => {
     //get the store with ID and confirm if they are the owner of the store. to enable editing
     const store = await Store.findOne({ _id: req.params.id});
+    // confirm owner
+    confirmOwner(store, req.user);  
     //then render out the edit form so the user can u[date their store
     res.render('editStore',{title: `Edit ${store.name}`, store: store});
 }
@@ -86,7 +95,7 @@ exports.updateStore = async (req,res) => {
 
 exports.getStoreBySlug = async (req, res) =>{
     //res.json(req.params.slug)
-    const store = await Store.findOne({ slug:req.params.slug})
+    const store = await Store.findOne({ slug:req.params.slug}).populate('author');
     if (!store){
         //if store doesnt exist we go to next. in app.js next goes to error handlers.. which gives a 404 error.
         return next();

@@ -41,7 +41,12 @@ const storeSchema = new mongoose.Schema({
         }
     },
 
-    photo: String
+    photo: String,
+    author: {
+        type: mongoose.Schema.ObjectId , 
+        ref: 'User', //referencing User.js. making a connection/relation bettwen User and Store
+        required: 'You must supply an author'
+    }
 
 });
 
